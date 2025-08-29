@@ -82,13 +82,17 @@ const ChatPage = () => {
 
   const handleVideoCall = () => {
     if (channel) {
-      const callUrl = `${window.location.origin}/call/${channel.id}`;
+      // Include targetUserId as query parameter for easier extraction in CallPage
+      const callUrl = `${window.location.origin}/call/${channel.id}?targetUserId=${targetUserId}`;
 
       channel.sendMessage({
         text: `I've started a video call. Join me here: ${callUrl}`,
       });
 
       toast.success("Video call link sent successfully!");
+      
+      // Navigate to call page immediately for the caller
+      window.open(callUrl, '_blank');
     }
   };
 
