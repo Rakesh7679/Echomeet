@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthUser from "../hooks/useAuthUser";
 import { BellIcon, LogOutIcon, MenuIcon, ShipWheelIcon, SearchIcon, XIcon } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
+import DarkModeToggle from "./DarkModeToggle";
 import useLogout from "../hooks/useLogout";
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -173,6 +174,8 @@ const Navbar = ({ showSidebar = false, toggleMobileMenu }) => {
                 <BellIcon className="h-4 w-4 sm:h-6 sm:w-6 text-base-content opacity-70" />
               </button>
             </Link>
+
+            <DarkModeToggle />
 
             <ThemeSelector />
 

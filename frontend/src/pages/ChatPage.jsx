@@ -95,28 +95,60 @@ const ChatPage = () => {
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   return (
-    <div className="h-[calc(100vh-4rem)] w-full">
+    <div className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] w-full bg-base-100 text-base-content overflow-hidden transition-colors duration-200">
       <Chat client={chatClient}>
         <Channel channel={channel}>
-          <div className="w-full h-full relative flex flex-col">
-            <div className="absolute top-2 right-2 z-10">
+          {/* Mobile First Layout */}
+          <div className="w-full h-full relative flex flex-col bg-base-100 transition-colors duration-200">
+            {/* Mobile Call Button - Fixed position with better mobile positioning */}
+            <div className="call-button-container absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-6 lg:right-6 z-30">
               <CallButton handleVideoCall={handleVideoCall} />
             </div>
+            
             <Window>
-              <div className="flex flex-col h-full">
-                <div className="flex-shrink-0">
-                  <ChannelHeader />
+              <div className="flex flex-col h-full bg-base-100 transition-colors duration-200">
+                {/* Mobile Header - Sticky and compact */}
+                <div className="flex-shrink-0 bg-base-200 border-b border-base-300 sticky top-0 z-10 transition-colors duration-200">
+                  <div className="px-2 py-1 sm:px-4 sm:py-2">
+                    <ChannelHeader />
+                  </div>
                 </div>
-                <div className="flex-1 min-h-0">
-                  <MessageList />
+                
+                {/* Mobile Message List - Full height with safe area */}
+                <div className="flex-1 min-h-0 bg-base-100 overflow-hidden transition-colors duration-200">
+                  <div className="h-full pb-safe">
+                    <MessageList 
+                      messageActions={['edit', 'delete', 'react']}
+                      additionalMessageInputProps={{
+                        maxRows: 3,
+                        placeholder: 'Type a message...'
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="flex-shrink-0 p-2 sm:p-0">
-                  <MessageInput focus />
+                
+                {/* Mobile Message Input - Sticky bottom with safe area */}
+                <div className="flex-shrink-0 bg-base-200 border-t border-base-300 sticky bottom-0 z-10 pb-safe transition-colors duration-200">
+                  <div className="p-2 sm:p-3 lg:p-4">
+                    <MessageInput 
+                      focus 
+                      grow
+                      maxRows={4}
+                      additionalTextareaProps={{
+                        placeholder: 'Type your message...',
+                        rows: 1
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </Window>
           </div>
-          <Thread />
+          
+          {/* Thread - Hidden on mobile, sidebar on tablet, overlay on desktop */}
+          <div className="hidden lg:block bg-base-100 transition-colors duration-200">
+            <Thread />
+          </div>
         </Channel>
       </Chat>
     </div>
