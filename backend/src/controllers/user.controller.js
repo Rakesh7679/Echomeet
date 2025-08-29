@@ -33,6 +33,48 @@ export async function getMyFriends(req, res) {
   }
 }
 
+export async function searchFriends(req, res) {
+  try {
+    const currentUserId = req.user.id;
+    const { q: query } = req.query;
+
+    if (!query || query.trim() === '') {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    console.log(`Searching for: "${query}" by user: ${currentUserId}`);
+
+    // Get current user to access their friends - updated search functionality
+    const currentUser = await User.findById(currentUserId).select("friends");
+    console.log(`Current user has ${currentUser.friends.length} friends`);
+    
+    // First, search among user's friends
+    let friends = await User.find({
+      _id: { $in: currentUser.friends },
+      fullName: { $regex: query, $options: 'i' } // case-insensitive search
+    }).select("fullName profilePic nativeLanguage learningLanguage location bio");
+
+    console.log(`Found ${friends.length} matching friends`);
+
+    // If no friends found, search among all users (excluding current user and existing friends)
+    if (friends.length === 0) {
+      friends = await User.find({
+        _id: { $ne: currentUserId }, // exclude current user
+        _id: { $nin: currentUser.friends }, // exclude existing friends
+        fullName: { $regex: query, $options: 'i' },
+        isOnboarded: true
+      }).select("fullName profilePic nativeLanguage learningLanguage location bio").limit(5);
+      
+      console.log(`Found ${friends.length} matching users (not friends yet)`);
+    }
+
+    res.status(200).json(friends);
+  } catch (error) {
+    console.error("Error in searchFriends controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 export async function sendFriendRequest(req, res) {
   try {
     const myId = req.user.id;

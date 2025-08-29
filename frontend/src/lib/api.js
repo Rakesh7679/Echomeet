@@ -25,7 +25,16 @@ export const getAuthUser = async () => {
 };
 
 export const completeOnboarding = async (userData) => {
-  const response = await axiosInstance.post("/auth/onboarding", userData);
+  const config = {};
+  
+  // If userData is FormData (contains file upload), set proper headers
+  if (userData instanceof FormData) {
+    config.headers = {
+      'Content-Type': 'multipart/form-data',
+    };
+  }
+  
+  const response = await axiosInstance.post("/auth/onboarding", userData, config);
   return response.data;
 };
 
@@ -50,8 +59,18 @@ export async function sendFriendRequest(userId) {
 }
 
 export async function getFriendRequests() {
-  const response = await axiosInstance.get("/users/friend-requests");
-  return response.data;
+  try {
+    console.log("Calling getFriendRequests API...");
+    console.log("Current cookies:", document.cookie);
+    const response = await axiosInstance.get("/users/friend-requests");
+    console.log("getFriendRequests response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("getFriendRequests error:", error);
+    console.error("Error response:", error.response?.data);
+    console.error("Error status:", error.response?.status);
+    throw error;
+  }
 }
 
 export async function acceptFriendRequest(requestId) {
@@ -61,5 +80,10 @@ export async function acceptFriendRequest(requestId) {
 
 export async function getStreamToken() {
   const response = await axiosInstance.get("/chat/token");
+  return response.data;
+}
+
+export async function searchFriends(query) {
+  const response = await axiosInstance.get(`/users/search?q=${encodeURIComponent(query)}`);
   return response.data;
 }

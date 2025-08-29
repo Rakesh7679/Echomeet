@@ -2,24 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { acceptFriendRequest, getFriendRequests } from "../lib/api";
 import { BellIcon, ClockIcon, MessageSquareIcon, UserCheckIcon } from "lucide-react";
 import NoNotificationsFound from "../components/NoNotificationsFound";
-import useAuthUser from "../hooks/useAuthUser";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
-  const { authUser } = useAuthUser();
 
-  console.log("NotificationsPage authUser:", authUser);
-  console.log("Current cookies:", document.cookie);
-
-  const { data: friendRequests, isLoading, error: friendRequestsError } = useQuery({
+  const { data: friendRequests, isLoading } = useQuery({
     queryKey: ["friendRequests"],
     queryFn: getFriendRequests,
-    onError: (error) => {
-      console.error("Error fetching friend requests:", error);
-    },
-    onSuccess: (data) => {
-      console.log("Friend requests data:", data);
-    }
   });
 
   const { mutate: acceptRequestMutation, isPending } = useMutation({
@@ -28,22 +17,10 @@ const NotificationsPage = () => {
       queryClient.invalidateQueries({ queryKey: ["friendRequests"] });
       queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
-    onError: (error) => {
-      console.error("Error accepting friend request:", error);
-    }
   });
 
   const incomingRequests = friendRequests?.incomingReqs || [];
   const acceptedRequests = friendRequests?.acceptedReqs || [];
-
-  console.log("NotificationsPage render:", { 
-    authUser,
-    friendRequests, 
-    isLoading, 
-    friendRequestsError, 
-    incomingRequests: incomingRequests.length, 
-    acceptedRequests: acceptedRequests.length 
-  });
 
   return (
     <div className="p-3 sm:p-4 md:p-6 lg:p-8">
@@ -53,10 +30,6 @@ const NotificationsPage = () => {
         {isLoading ? (
           <div className="flex justify-center py-12">
             <span className="loading loading-spinner loading-lg"></span>
-          </div>
-        ) : friendRequestsError ? (
-          <div className="alert alert-error">
-            <span>Error loading notifications: {friendRequestsError.message}</span>
           </div>
         ) : (
           <>
@@ -69,7 +42,7 @@ const NotificationsPage = () => {
                 </h2>
 
                 <div className="space-y-2 sm:space-y-3">
-                  {incomingRequests.filter(request => request && request.sender).map((request) => (
+                  {incomingRequests.map((request) => (
                     <div
                       key={request._id}
                       className="card bg-base-200 shadow-sm hover:shadow-md transition-shadow"
@@ -79,22 +52,19 @@ const NotificationsPage = () => {
                           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                             <div className="avatar w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-base-300 flex-shrink-0">
                               <img 
-                                src={request.sender?.profilePic || '/default-avatar.png'} 
-                                alt={request.sender?.fullName || 'User'}
+                                src={request.sender.profilePic} 
+                                alt={request.sender.fullName}
                                 className="w-full h-full object-cover rounded-full"
-                                onError={(e) => {
-                                  e.target.src = '/default-avatar.png';
-                                }}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm sm:text-base truncate">{request.sender?.fullName || 'Unknown User'}</h3>
+                              <h3 className="font-semibold text-sm sm:text-base truncate">{request.sender.fullName}</h3>
                               <div className="flex flex-col sm:flex-row gap-1 sm:gap-1.5 mt-1">
                                 <span className="badge badge-secondary badge-xs sm:badge-sm">
-                                  Native: {request.sender?.nativeLanguage || 'Unknown'}
+                                  Native: {request.sender.nativeLanguage}
                                 </span>
                                 <span className="badge badge-outline badge-xs sm:badge-sm">
-                                  Learning: {request.sender?.learningLanguage || 'Unknown'}
+                                  Learning: {request.sender.learningLanguage}
                                 </span>
                               </div>
                             </div>
@@ -123,24 +93,21 @@ const NotificationsPage = () => {
                 </h2>
 
                 <div className="space-y-2 sm:space-y-3">
-                  {acceptedRequests.filter(notification => notification && notification.recipient).map((notification) => (
+                  {acceptedRequests.map((notification) => (
                     <div key={notification._id} className="card bg-base-200 shadow-sm">
                       <div className="card-body p-3 sm:p-4">
                         <div className="flex items-start gap-2 sm:gap-3">
                           <div className="avatar mt-1 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex-shrink-0">
                             <img
-                              src={notification.recipient?.profilePic || '/default-avatar.png'}
-                              alt={notification.recipient?.fullName || 'User'}
+                              src={notification.recipient.profilePic}
+                              alt={notification.recipient.fullName}
                               className="w-full h-full object-cover rounded-full"
-                              onError={(e) => {
-                                e.target.src = '/default-avatar.png';
-                              }}
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm sm:text-base">{notification.recipient?.fullName || 'Unknown User'}</h3>
+                            <h3 className="font-semibold text-sm sm:text-base">{notification.recipient.fullName}</h3>
                             <p className="text-xs sm:text-sm my-1">
-                              {notification.recipient?.fullName || 'Someone'} accepted your friend request
+                              {notification.recipient.fullName} accepted your friend request
                             </p>
                             <p className="text-xs flex items-center opacity-70">
                               <ClockIcon className="h-3 w-3 mr-1 flex-shrink-0" />

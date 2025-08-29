@@ -45,7 +45,7 @@ const CallPage = () => {
         const user = {
           id: authUser._id,
           name: authUser.fullName,
-          image: authUser.profilePic,
+          image: authUser?.profilePic || '/default-avatar.png',
         };
 
         const videoClient = new StreamVideoClient({
@@ -76,8 +76,8 @@ const CallPage = () => {
   if (isLoading || isConnecting) return <PageLoader />;
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center">
-      <div className="relative">
+    <div className="h-screen w-full flex flex-col items-center justify-center bg-black">
+      <div className="w-full h-full max-w-7xl mx-auto">
         {client && call ? (
           <StreamVideo client={client}>
             <StreamCall call={call}>
@@ -86,7 +86,7 @@ const CallPage = () => {
           </StreamVideo>
         ) : (
           <div className="flex items-center justify-center h-full">
-            <p>Could not initialize call. Please refresh or try again later.</p>
+            <p className="text-white text-center px-4">Could not initialize call. Please refresh or try again later.</p>
           </div>
         )}
       </div>
@@ -103,9 +103,15 @@ const CallContent = () => {
   if (callingState === CallingState.LEFT) return navigate("/");
 
   return (
-    <StreamTheme>
-      <SpeakerLayout />
-      <CallControls />
+    <StreamTheme className="w-full h-full">
+      <div className="flex flex-col w-full h-full">
+        <div className="flex-1 w-full">
+          <SpeakerLayout />
+        </div>
+        <div className="flex-shrink-0 p-2 sm:p-4">
+          <CallControls />
+        </div>
+      </div>
     </StreamTheme>
   );
 };

@@ -2,27 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Stream Chat Responsive Styles */
 .str-chat__channel {
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(to bottom, #c9e8c9, #b7e7bb);
   height: 100%;
+  width: 100%;
 }
 
 .str-chat__container {
-  max-width: 1200px;
+  max-width: 100%;
   width: 100%;
-  height: 80% !important;
-  margin: 0 auto !important;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: 100% !important;
+  margin: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .str-chat__container {
+    max-width: 1200px;
+    height: 85% !important;
+    margin: 0 auto !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
 }
 
 .str-chat__list {
   background-color: #ffffff;
-  padding: 12px;
+  padding: 8px;
+}
+
+@media (min-width: 640px) {
+  .str-chat__list {
+    padding: 12px;
+  }
 }
 
 .str-chat__list-notifications {
@@ -31,4 +49,82 @@
 
 .str-chat__message-input {
   border-top: 1px solid #ddd;
+  padding: 8px;
+}
+
+@media (min-width: 640px) {
+  .str-chat__message-input {
+    padding: 12px;
+  }
+}
+
+/* Mobile-first responsive adjustments */
+.str-chat__message-input-inner {
+  padding: 4px !important;
+}
+
+@media (min-width: 640px) {
+  .str-chat__message-input-inner {
+    padding: 8px !important;
+  }
+}
+
+.str-chat__message-text {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+@media (min-width: 640px) {
+  .str-chat__message-text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+/* Avatar adjustments for mobile */
+.str-chat__avatar {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+@media (min-width: 640px) {
+  .str-chat__avatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* Thread adjustments for mobile */
+.str-chat__thread {
+  width: 100% !important;
+}
+
+@media (min-width: 768px) {
+  .str-chat__thread {
+    width: 350px !important;
+  }
+}
+
+/* Header responsive styling */
+.str-chat__header-livestream {
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+@media (min-width: 640px) {
+  .str-chat__header-livestream {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* Message list spacing */
+.str-chat__virtual-message__wrapper {
+  padding: 4px 8px !important;
+}
+
+@media (min-width: 640px) {
+  .str-chat__virtual-message__wrapper {
+    padding: 8px 12px !important;
+  }
 }

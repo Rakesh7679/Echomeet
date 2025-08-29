@@ -1,6 +1,7 @@
 import { upsertStreamUser } from "../lib/stream.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import { uploadImage, isCloudinaryConfigured } from "../lib/cloudinary.js";
 
 export async function signup(req, res) {
   const { email, password, fullName } = req.body;
@@ -105,7 +106,7 @@ export async function onboard(req, res) {
   try {
     const userId = req.user._id;
 
-    const { fullName, bio, nativeLanguage, learningLanguage, location } = req.body;
+    const { fullName, bio, nativeLanguage, learningLanguage, location, profilePicUrl } = req.body;
 
     if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
       return res.status(400).json({
@@ -120,10 +121,28 @@ export async function onboard(req, res) {
       });
     }
 
+    let profilePicture = profilePicUrl || req.user.profilePic; // Default to existing or provided URL
+
+    // If file is uploaded, upload to cloudinary
+    if (req.file) {
+      try {
+        const uploadResult = await uploadImage(req.file.buffer);
+        profilePicture = uploadResult.secure_url;
+      } catch (uploadError) {
+        console.error('Error uploading image to cloudinary:', uploadError);
+        return res.status(400).json({ message: "Error uploading profile picture" });
+      }
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        ...req.body,
+        fullName,
+        bio,
+        nativeLanguage,
+        learningLanguage,
+        location,
+        profilePic: profilePicture,
         isOnboarded: true,
       },
       { new: true }

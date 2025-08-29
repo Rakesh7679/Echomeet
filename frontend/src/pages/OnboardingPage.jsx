@@ -3,7 +3,7 @@ import useAuthUser from "../hooks/useAuthUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { completeOnboarding } from "../lib/api";
-import { LoaderIcon, MapPinIcon, ShipWheelIcon, ShuffleIcon } from "lucide-react";
+import { LoaderIcon, MapPinIcon, ShipWheelIcon, ShuffleIcon, CameraIcon, UploadIcon } from "lucide-react";
 import { LANGUAGES } from "../constants";
 
 const OnboardingPage = () => {
@@ -18,6 +18,9 @@ const OnboardingPage = () => {
     location: authUser?.location || "",
     profilePic: authUser?.profilePic || "",
   });
+
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(authUser?.profilePic || "");
 
   const { mutate: onboardingMutation, isPending } = useMutation({
     mutationFn: completeOnboarding,
@@ -34,7 +37,48 @@ const OnboardingPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    onboardingMutation(formState);
+    // Create FormData to handle file upload
+    const formData = new FormData();
+    formData.append('fullName', formState.fullName);
+    formData.append('bio', formState.bio);
+    formData.append('nativeLanguage', formState.nativeLanguage);
+    formData.append('learningLanguage', formState.learningLanguage);
+    formData.append('location', formState.location);
+    
+    if (selectedFile) {
+      formData.append('profilePic', selectedFile);
+    } else if (formState.profilePic) {
+      formData.append('profilePicUrl', formState.profilePic);
+    }
+
+    onboardingMutation(formData);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+
+      setSelectedFile(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target.result);
+        setFormState({ ...formState, profilePic: "" }); // Clear random avatar
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleRandomAvatar = () => {
@@ -42,6 +86,8 @@ const OnboardingPage = () => {
     const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
 
     setFormState({ ...formState, profilePic: randomAvatar });
+    setPreviewUrl(randomAvatar);
+    setSelectedFile(null); // Clear selected file
     toast.success("Random profile picture generated!");
   };
 
@@ -55,10 +101,10 @@ const OnboardingPage = () => {
             {/* PROFILE PIC CONTAINER */}
             <div className="flex flex-col items-center justify-center space-y-4">
               {/* IMAGE PREVIEW */}
-              <div className="size-32 rounded-full bg-base-300 overflow-hidden">
-                {formState.profilePic ? (
+              <div className="size-32 rounded-full bg-base-300 overflow-hidden border-4 border-dashed border-base-300 hover:border-primary transition-colors">
+                {previewUrl || formState.profilePic ? (
                   <img
-                    src={formState.profilePic}
+                    src={previewUrl || formState.profilePic}
                     alt="Profile Preview"
                     className="w-full h-full object-cover"
                   />
@@ -69,13 +115,33 @@ const OnboardingPage = () => {
                 )}
               </div>
 
-              {/* Generate Random Avatar BTN */}
-              <div className="flex items-center gap-2">
+              {/* Upload and Generate Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                {/* File Upload Button */}
+                <label className="btn btn-primary cursor-pointer">
+                  <UploadIcon className="size-4 mr-2" />
+                  Upload Photo
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+
+                {/* Generate Random Avatar BTN */}
                 <button type="button" onClick={handleRandomAvatar} className="btn btn-accent">
                   <ShuffleIcon className="size-4 mr-2" />
-                  Generate Random Avatar
+                  Random Avatar
                 </button>
               </div>
+              
+              {/* File upload info */}
+              <p className="text-xs text-base-content opacity-70 text-center">
+                Upload your own photo or generate a random avatar
+                <br />
+                Supported: JPG, PNG, GIF (Max 5MB)
+              </p>
             </div>
 
             {/* FULL NAME */}

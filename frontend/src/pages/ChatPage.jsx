@@ -49,7 +49,7 @@ const ChatPage = () => {
           {
             id: authUser._id,
             name: authUser.fullName,
-            image: authUser.profilePic,
+            image: authUser?.profilePic || '/default-avatar.png',
           },
           tokenData.token
         );
@@ -95,15 +95,25 @@ const ChatPage = () => {
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   return (
-    <div className="h-[93vh]">
+    <div className="h-[calc(100vh-4rem)] w-full">
       <Chat client={chatClient}>
         <Channel channel={channel}>
-          <div className="w-full relative">
-            <CallButton handleVideoCall={handleVideoCall} />
+          <div className="w-full h-full relative flex flex-col">
+            <div className="absolute top-2 right-2 z-10">
+              <CallButton handleVideoCall={handleVideoCall} />
+            </div>
             <Window>
-              <ChannelHeader />
-              <MessageList />
-              <MessageInput focus />
+              <div className="flex flex-col h-full">
+                <div className="flex-shrink-0">
+                  <ChannelHeader />
+                </div>
+                <div className="flex-1 min-h-0">
+                  <MessageList />
+                </div>
+                <div className="flex-shrink-0 p-2 sm:p-0">
+                  <MessageInput focus />
+                </div>
+              </div>
             </Window>
           </div>
           <Thread />

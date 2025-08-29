@@ -42,9 +42,7 @@ const HomePage = () => {
     const outgoingIds = new Set();
     if (outgoingFriendReqs && outgoingFriendReqs.length > 0) {
       outgoingFriendReqs.forEach((req) => {
-        if (req && req.recipient && req.recipient._id) {
-          outgoingIds.add(req.recipient._id);
-        }
+        outgoingIds.add(req.recipient._id);
       });
       setOutgoingRequestsIds(outgoingIds);
     }

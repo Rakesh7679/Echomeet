@@ -1,6 +1,7 @@
 import express from "express";
 import { login, logout, onboard, signup } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
+import { upload } from "../middleware/upload.middleware.js";
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
 
-router.post("/onboarding", protectRoute, onboard);
+router.post("/onboarding", protectRoute, upload.single('profilePic'), onboard);
 
 // check if user is logged in
 router.get("/me", protectRoute, (req, res) => {
