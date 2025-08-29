@@ -95,7 +95,7 @@ const ChatPage = () => {
   if (loading || !chatClient || !channel) return <ChatLoader />;
 
   return (
-    <div className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] w-full bg-base-100 text-base-content overflow-hidden transition-colors duration-200">
+    <div className="h-[calc(100vh-2rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] w-full bg-base-100 text-base-content overflow-hidden transition-colors duration-200">
       <Chat client={chatClient}>
         <Channel channel={channel}>
           {/* Mobile First Layout */}
@@ -108,8 +108,8 @@ const ChatPage = () => {
             <Window>
               <div className="flex flex-col h-full bg-base-100 transition-colors duration-200">
                 {/* Mobile Header - Sticky and compact */}
-                <div className="flex-shrink-0 bg-base-200 border-b border-base-300 sticky top-0 z-10 transition-colors duration-200">
-                  <div className="px-2 py-1 sm:px-4 sm:py-2">
+                <div className="flex-shrink-0 bg-base-200 border-b border-base-300 sticky top-2 z-10 transition-colors duration-200 mt-2">
+                  <div className="px-2 py-2 sm:px-4 sm:py-3">
                     <ChannelHeader />
                   </div>
                 </div>
